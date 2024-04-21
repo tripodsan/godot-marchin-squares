@@ -6,43 +6,6 @@
 
 [node name="Node2D" type="Node2D"]
 
-[node name="blob" type="Node2D" parent="."]
-position = Vector2(296, 384)
-script = ExtResource("1_j6j8t")
-cell_size = 5.946
-limit = 1.155
-
-[node name="point0" type="Marker2D" parent="blob"]
-position = Vector2(-111, 58)
-script = ExtResource("2_wn51m")
-radius = 59.86
-square = true
-
-[node name="point1" type="Marker2D" parent="blob"]
-position = Vector2(188, -101)
-script = ExtResource("2_wn51m")
-radius = 75.099
-
-[node name="point2" type="Marker2D" parent="blob"]
-position = Vector2(-138, -145)
-script = ExtResource("2_wn51m")
-
-[node name="point3" type="Marker2D" parent="blob"]
-position = Vector2(338, -188)
-script = ExtResource("2_wn51m")
-radius = 46.414
-
-[node name="point4" type="Marker2D" parent="blob"]
-position = Vector2(54, -51)
-script = ExtResource("2_wn51m")
-radius = 56.274
-square = true
-
-[node name="point5" type="Marker2D" parent="blob"]
-position = Vector2(-26, -198)
-script = ExtResource("2_wn51m")
-radius = 59.86
-
 [node name="Control" type="Control" parent="."]
 layout_mode = 3
 anchors_preset = 15
@@ -85,5 +48,74 @@ text = "Add"
 [node name="btn_remove" type="Button" parent="Control/HSplitContainer/PanelContainer/VBoxContainer"]
 layout_mode = 2
 text = "delete"
+
+[node name="blob" type="Node2D" parent="."]
+position = Vector2(322, 373)
+script = ExtResource("1_j6j8t")
+cell_size = 50.0
+limit = 1.089
+show_grid = true
+
+[node name="polys" type="Node2D" parent="blob"]
+
+[node name="@Polygon2D@41267" type="Polygon2D" parent="blob/polys"]
+polygon = PackedVector2Array(-188, -307.961, -192.528, -302.099, -192.528, -302.099, -203.974, -252.099, -203.974, -252.099, -207.243, -202.099, -207.243, -202.099, -223.64, -152.099, -223.64, -152.099, -213.021, -102.099, -213.021, -102.099, -200.642, -52.099, -200.642, -52.099, -188, -14.2055, -188, -14.2055, -187.383, -2.099, -187.383, -2.099, -176.035, 47.901, -176.035, 47.901, -138, 73.9366, -138, 73.9366, -88, 79.2518, -88, 79.2518, -44.3776, 47.901, -44.3776, 47.901, -38, 14.6819, -38, 14.6819, 12, 21.6019, 12, 21.6019, 62, 11.4855, 62, 11.4855, 95.8026, -2.099, 95.8026, -2.099, 111.988, -52.099, 111.988, -52.099, 112, -52.6769, 112, -52.6769, 125.823, -102.099, 125.823, -102.099, 112, -142.686, 112, -142.686, 62, -145.764, 62, -145.764, 36.0081, -152.099, 47.18, -202.099, 62, -191.023, 62, -191.023, 112, -154.466, 112, -154.466, 162, -153.966, 162, -153.966, 212, -156.774, 212, -156.774, 212.946, -152.099, 212.946, -152.099, 262, -111.709, 262, -111.709, 312, -124.185, 312, -124.185, 338.247, -152.099, 338.247, -152.099, 343.84, -202.099, 343.84, -202.099, 312, -238.053, 312, -238.053, 262, -250.122, 262, -250.122, 251.646, -252.099, 251.646, -252.099, 212, -293.612, 212, -293.612, 208.908, -302.099, 208.908, -302.099, 162, -340.302, 162, -340.302, 112, -334.869, 112, -334.869, 69.9289, -302.099, 69.9289, -302.099, 62, -273.564, 62, -273.564, 17.6732, -252.099, 17.6732, -252.099, 47.18, -202.099)
+
+[node name="@Polygon2D@41268" type="Polygon2D" parent="blob/polys"]
+polygon = PackedVector2Array(-138, -359.782, -148.471, -352.099, -148.471, -352.099, -188, -307.961)
+
+[node name="@Polygon2D@41269" type="Polygon2D" parent="blob/polys"]
+polygon = PackedVector2Array(-88, -370.826, -138, -359.782)
+
+[node name="@Polygon2D@41270" type="Polygon2D" parent="blob/polys"]
+polygon = PackedVector2Array(-53.3614, -352.099, -88, -370.826)
+
+[node name="@Polygon2D@41271" type="Polygon2D" parent="blob/polys"]
+polygon = PackedVector2Array(-38, -344.15, -53.3614, -352.099)
+
+[node name="@Polygon2D@41272" type="Polygon2D" parent="blob/polys"]
+polygon = PackedVector2Array(3.56432, -302.099, -38, -344.15)
+
+[node name="@Polygon2D@41273" type="Polygon2D" parent="blob/polys"]
+polygon = PackedVector2Array(11.2623, -252.099, 3.56432, -302.099)
+
+[node name="@Polygon2D@41274" type="Polygon2D" parent="blob/polys"]
+polygon = PackedVector2Array(8.111, -202.099, 11.2623, -252.099)
+
+[node name="@Polygon2D@41275" type="Polygon2D" parent="blob/polys"]
+polygon = PackedVector2Array(12, -180.979, 8.111, -202.099)
+
+[node name="points" type="Node2D" parent="blob"]
+
+[node name="point0" type="Marker2D" parent="blob/points"]
+position = Vector2(-126, 8)
+script = ExtResource("2_wn51m")
+radius = 59.86
+square = true
+
+[node name="point1" type="Marker2D" parent="blob/points"]
+position = Vector2(-102, -277)
+script = ExtResource("2_wn51m")
+radius = 75.099
+
+[node name="point2" type="Marker2D" parent="blob/points"]
+position = Vector2(-138, -145)
+script = ExtResource("2_wn51m")
+
+[node name="point3" type="Marker2D" parent="blob/points"]
+position = Vector2(281, -180)
+script = ExtResource("2_wn51m")
+radius = 46.414
+
+[node name="point4" type="Marker2D" parent="blob/points"]
+position = Vector2(54, -51)
+script = ExtResource("2_wn51m")
+radius = 56.274
+square = true
+
+[node name="point5" type="Marker2D" parent="blob/points"]
+position = Vector2(145, -258)
+script = ExtResource("2_wn51m")
+radius = 59.86
 
 [connection signal="pressed" from="Control/HSplitContainer/PanelContainer/VBoxContainer/btn_add" to="blob" method="_on_btn_add_pressed"]
