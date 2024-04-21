@@ -1,0 +1,89 @@
+[gd_scene load_steps=4 format=3 uid="uid://ddypaku1dxkiq"]
+
+[ext_resource type="Script" path="res://blob.gd" id="1_j6j8t"]
+[ext_resource type="Script" path="res://blob_point.gd" id="2_wn51m"]
+[ext_resource type="Script" path="res://AutoSplitContainer.gd" id="3_cmt56"]
+
+[node name="Node2D" type="Node2D"]
+
+[node name="blob" type="Node2D" parent="."]
+position = Vector2(296, 384)
+script = ExtResource("1_j6j8t")
+cell_size = 5.946
+limit = 1.155
+
+[node name="point0" type="Marker2D" parent="blob"]
+position = Vector2(-111, 58)
+script = ExtResource("2_wn51m")
+radius = 59.86
+square = true
+
+[node name="point1" type="Marker2D" parent="blob"]
+position = Vector2(188, -101)
+script = ExtResource("2_wn51m")
+radius = 75.099
+
+[node name="point2" type="Marker2D" parent="blob"]
+position = Vector2(-138, -145)
+script = ExtResource("2_wn51m")
+
+[node name="point3" type="Marker2D" parent="blob"]
+position = Vector2(338, -188)
+script = ExtResource("2_wn51m")
+radius = 46.414
+
+[node name="point4" type="Marker2D" parent="blob"]
+position = Vector2(54, -51)
+script = ExtResource("2_wn51m")
+radius = 56.274
+square = true
+
+[node name="point5" type="Marker2D" parent="blob"]
+position = Vector2(-26, -198)
+script = ExtResource("2_wn51m")
+radius = 59.86
+
+[node name="Control" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_right = 960.0
+offset_bottom = 540.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+mouse_filter = 1
+
+[node name="HSplitContainer" type="HSplitContainer" parent="Control"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+split_offset = 400
+script = ExtResource("3_cmt56")
+flip_split_offset = true
+
+[node name="MarginContainer" type="MarginContainer" parent="Control/HSplitContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="PanelContainer" type="PanelContainer" parent="Control/HSplitContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Control/HSplitContainer/PanelContainer"]
+layout_mode = 2
+
+[node name="btn_add" type="Button" parent="Control/HSplitContainer/PanelContainer/VBoxContainer"]
+layout_mode = 2
+text = "Add"
+
+[node name="btn_remove" type="Button" parent="Control/HSplitContainer/PanelContainer/VBoxContainer"]
+layout_mode = 2
+text = "delete"
+
+[connection signal="pressed" from="Control/HSplitContainer/PanelContainer/VBoxContainer/btn_add" to="blob" method="_on_btn_add_pressed"]
