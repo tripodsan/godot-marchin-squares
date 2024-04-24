@@ -4,6 +4,7 @@ class_name Blob
 
 @onready var points: Node2D = $points
 @onready var polys: Node2D = $polys
+@onready var num_points: Label = $'../Control/HSplitContainer/PanelContainer/VBoxContainer/num_points'
 
 #  Vertex: 1.2         Edge  .0.
 #          . .               3 1
@@ -88,10 +89,27 @@ var selected:BlobPoint
     show_grid = value
     recalc()
 
+@export var show_lines:bool = false:
+  set(value):
+    show_lines = value
+    recalc()
+
+@export var optimize_polygons:bool = false:
+  set(value):
+    optimize_polygons = value
+    recalc()
+
 @export var generate_polygons:bool = false:
   set(value):
     generate_polygons = value
     recalc()
+
+@export_range(0.1, 20.0) var simplify_tolerance:float = 1.0:
+  set(value):
+    simplify_tolerance = value
+    recalc()
+
+var num_polygon_points:int = 0
 
 func _ready():
   for b:BlobPoint in points.get_children():
@@ -99,6 +117,7 @@ func _ready():
   if !Engine.is_editor_hint():
     for b:BlobPoint in points.get_children():
       b.clicked.connect(_on_point_clicked.bind(b))
+
 
 func _on_point_clicked(event:InputEventMouseButton, pt:BlobPoint)->void:
   if event.pressed:
@@ -124,9 +143,16 @@ func sdf(x:float, y:float)->float:
 
 func commit_poly(pts:Array[Vector2])->void:
   if pts.size() > 2:
+    # check if polygon is inside any other
+    for poly:Polygon2D in polys.get_children():
+      if Geometry2D.is_point_in_polygon(pts[0], poly.polygon):
+        return
+    if optimize_polygons:
+      pts = Simplify.simplify(pts, simplify_tolerance, true)
     var poly:Polygon2D = Polygon2D.new()
     poly.set_polygon(PackedVector2Array(pts))
     polys.add_child(poly)
+    num_polygon_points += pts.size()
     if Engine.is_editor_hint():
       poly.owner = get_tree().edited_scene_root
 
@@ -153,6 +179,7 @@ func calcEdges(s:Quaternion, p:Quaternion)->Array[Vector2]:
   return [e0, e1, e2, e3]
 
 func calc_lines()->void:
+  num_polygon_points = 0
   for p in polys.get_children():
     polys.remove_child(p)
     p.queue_free()
@@ -195,7 +222,8 @@ func calc_lines()->void:
       else:
         visited[cell] = 2**from
       var to = connection_table[idx][from]
-      draw_line(edges[from], edges[to], color, 0.5, true)
+      if show_lines:
+        draw_line(edges[from], edges[to], color, 0.5, true)
       if generate_polygons:
         if pts.is_empty():
           pts.push_back(edges[from])
@@ -209,6 +237,8 @@ func recalc()->void:
 
 func _draw()->void:
   calc_lines()
+  if num_points:
+    num_points.text = '%d' % num_polygon_points
 
 func _on_btn_add_pressed() -> void:
   var b = BlobPoint.new()
@@ -232,3 +262,15 @@ func _on_btn_grid_toggled(toggled_on: bool) -> void:
 
 func _on_btn_polygons_toggled(toggled_on: bool) -> void:
   generate_polygons = toggled_on
+
+func _on_tolerance_spin_value_changed(value: float) -> void:
+  simplify_tolerance = value
+
+func _on_btn_lines_toggled(toggled_on: bool) -> void:
+  show_lines = toggled_on
+
+func _on_btn_simplify_toggled(toggled_on: bool) -> void:
+  optimize_polygons = toggled_on
+
+func _on_limit_spin_value_changed(value: float) -> void:
+  limit = value
