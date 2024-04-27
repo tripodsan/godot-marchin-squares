@@ -1,10 +1,12 @@
 @tool
-extends Node2D
+extends RigidBody2D
 class_name Blob
+
+signal updated()
 
 @onready var points: Node2D = $points
 @onready var polys: Node2D = $polys
-@onready var num_points: Label = $'../Control/HSplitContainer/PanelContainer/VBoxContainer/num_points'
+@onready var visual: Node2D = $visual
 
 #  Vertex: 1.2         Edge  .0.
 #          . .               3 1
@@ -104,12 +106,26 @@ var selected:BlobPoint
     generate_polygons = value
     recalc()
 
+@export var generate_collision:bool = true:
+  set(value):
+    generate_collision = value
+    recalc()
+
+## Calculate Center of Mass
+@export var calc_com_enabled:bool = true:
+  set(value):
+    calc_com_enabled = value
+    recalc()
+
 @export_range(0.1, 20.0) var simplify_tolerance:float = 1.0:
   set(value):
     simplify_tolerance = value
     recalc()
 
 var num_polygon_points:int = 0
+
+## the center of all points
+var center:Vector2 = Vector2.ZERO
 
 func _ready():
   for b:BlobPoint in points.get_children():
@@ -141,7 +157,7 @@ func sdf(x:float, y:float)->float:
     dist += b.sdf(x, y)
   return dist
 
-func commit_poly(pts:Array[Vector2])->void:
+func commit_poly(pts:PackedVector2Array)->void:
   if pts.size() > 2:
     # check if polygon is inside any other
     for poly:Polygon2D in polys.get_children():
@@ -150,11 +166,19 @@ func commit_poly(pts:Array[Vector2])->void:
     if optimize_polygons:
       pts = Simplify.simplify(pts, simplify_tolerance, true)
     var poly:Polygon2D = Polygon2D.new()
-    poly.set_polygon(PackedVector2Array(pts))
+    poly.set_polygon(pts)
     polys.add_child(poly)
     num_polygon_points += pts.size()
     if Engine.is_editor_hint():
       poly.owner = get_tree().edited_scene_root
+    if generate_collision:
+      var colpoly:CollisionPolygon2D = CollisionPolygon2D.new()
+      colpoly.build_mode = CollisionPolygon2D.BUILD_SOLIDS
+      colpoly.polygon = pts;
+      add_child(colpoly)
+      if Engine.is_editor_hint():
+        colpoly.owner = get_tree().edited_scene_root
+
 
 func calcSDF(pos:Quaternion)->Quaternion:
   var s0 = sdf(pos.x, pos.y)
@@ -180,12 +204,30 @@ func calcEdges(s:Quaternion, p:Quaternion)->Array[Vector2]:
 
 func calc_lines()->void:
   num_polygon_points = 0
-  for p in polys.get_children():
-    polys.remove_child(p)
-    p.queue_free()
+  if polys:
+    for p in polys.get_children():
+      polys.remove_child(p)
+      p.queue_free()
+  for p in get_children():
+    if p is CollisionPolygon2D:
+      remove_child(p)
+      p.queue_free()
+
   var visited:Dictionary = {}
+
+  # calculate center first, relative to self
+  center = Vector2.ZERO
   for p:BlobPoint in points.get_children():
-    var pts:Array[Vector2] = []
+    center += p.position
+  center = (center / points.get_child_count()) + points.position
+  if !calc_com_enabled:
+    # shift points
+    for p:BlobPoint in points.get_children():
+      p.translate_silent(-center)
+
+  for p:BlobPoint in points.get_children():
+    p.show_lines = show_lines
+    var pts:PackedVector2Array = PackedVector2Array()
     # start in the center of the blob and find the edge
     var cell = Vector2i(p.position.x / cell_size, p.position.y / cell_size)
     var hue = 0.0
@@ -232,45 +274,63 @@ func calc_lines()->void:
       cell += edge_direction[to]
       from = (to + 2) % 4
 
+  if calc_com_enabled:
+    center_of_mass_mode = RigidBody2D.CENTER_OF_MASS_MODE_CUSTOM
+    center_of_mass = center
+    visual.position = center
+  else:
+    center_of_mass_mode = RigidBody2D.CENTER_OF_MASS_MODE_AUTO
+    if center != Vector2.ZERO:
+      if Engine.is_editor_hint():
+        center_blob(self)
+
+## centers the blob using the `center` offset and repositions the points
+func center_blob(state)->void:
+  state.transform = state.transform.translated(center)
+  center = Vector2.ZERO
+
+
+func _integrate_forces(state: PhysicsDirectBodyState2D)->void:
+  if !calc_com_enabled && center != Vector2.ZERO:
+    center_blob(state)
+
 func recalc()->void:
   queue_redraw()
 
-func _draw()->void:
-  calc_lines()
-  if num_points:
-    num_points.text = '%d' % num_polygon_points
-
-func _on_btn_add_pressed() -> void:
+func add_point():
   var b = BlobPoint.new()
   points.add_child(b)
   b.local_transform_changed.connect(recalc)
   b.clicked.connect(_on_point_clicked.bind(b))
   select(b, true)
 
-func _on_range_spin_value_changed(value: float) -> void:
-  cell_size = value
-
-func _on_btn_remove_pressed() -> void:
+func remove_point() -> void:
   if selected:
     points.remove_child(selected)
     selected.queue_free()
     selected = null
     recalc()
 
-func _on_btn_grid_toggled(toggled_on: bool) -> void:
-  show_grid = toggled_on
+func _draw()->void:
+  calc_lines()
+  updated.emit()
 
-func _on_btn_polygons_toggled(toggled_on: bool) -> void:
-  generate_polygons = toggled_on
+var time:float = 0.0
+func _process(delta:float)->void:
+  if Engine.is_editor_hint():
+    return
+  time += delta
+  var idx:int = 0
+  var num = points.get_child_count()
+  var speed = 2
+  var d = TAU / 3
+  for p:BlobPoint in points.get_children():
+    var pair:int = idx / 3
+    #p.position.x = pair * 150
+    #p.position.y = (idx % 2 -1) * 50 + sin(time * TAU + idx*TAU/num) * 50
+    p.position.x = cos(time * speed * d + idx * d) * 80 + pair * 200
+    p.position.y = sin(time * speed * d + idx * d) * 50
+    idx += 1
 
-func _on_tolerance_spin_value_changed(value: float) -> void:
-  simplify_tolerance = value
 
-func _on_btn_lines_toggled(toggled_on: bool) -> void:
-  show_lines = toggled_on
 
-func _on_btn_simplify_toggled(toggled_on: bool) -> void:
-  optimize_polygons = toggled_on
-
-func _on_limit_spin_value_changed(value: float) -> void:
-  limit = value

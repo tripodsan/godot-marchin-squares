@@ -24,21 +24,21 @@ static func getSqSegDist(p:Vector2, p1:Vector2, p2:Vector2)->float:
   return dx * dx + dy * dy;
 
 # basic distance-based simplification
-static func simplifyRadialDist(points:Array[Vector2], sqTolerance:float)->Array[Vector2]:
+static func simplifyRadialDist(points:PackedVector2Array, sqTolerance:float)->PackedVector2Array:
   var prevPoint = points[0]
-  var newPoints = [prevPoint]
+  var newPoints:PackedVector2Array = PackedVector2Array([prevPoint])
   var point
   for i in range(1, points.size()):
     point = points[i]
     if (point.distance_squared_to(prevPoint) > sqTolerance):
-      newPoints.push(point);
+      newPoints.push_back(point);
       prevPoint = point;
 
   if (prevPoint != point):
-    newPoints.push(point);
+    newPoints.push_back(point);
   return newPoints;
 
-static func simplifyDPStep(points:Array[Vector2], first:int, last:int, sqTolerance:float, simplified:Array[Vector2]):
+static func simplifyDPStep(points:PackedVector2Array, first:int, last:int, sqTolerance:float, simplified:PackedVector2Array):
   var maxSqDist = sqTolerance
   var index
 
@@ -56,15 +56,15 @@ static func simplifyDPStep(points:Array[Vector2], first:int, last:int, sqToleran
         simplifyDPStep(points, index, last, sqTolerance, simplified);
 
 # simplification using Ramer-Douglas-Peucker algorithm
-static func simplifyDouglasPeucker(points:Array[Vector2], sqTolerance:float)->Array[Vector2]:
+static func simplifyDouglasPeucker(points:PackedVector2Array, sqTolerance:float)->PackedVector2Array:
   var last = points.size() - 1;
-  var simplified:Array[Vector2] = [points[0]]
+  var simplified:PackedVector2Array = PackedVector2Array([points[0]])
   simplifyDPStep(points, 0, last, sqTolerance, simplified);
   simplified.push_back(points[last]);
   return simplified;
 
 # both algorithms combined for awesome performance
-static func simplify(points:Array[Vector2], tolerance:float = 1, highestQuality:bool = false)->Array[Vector2]:
+static func simplify(points:PackedVector2Array, tolerance:float = 1, highestQuality:bool = false)->PackedVector2Array:
   if (points.size() <= 2):
       return points;
 

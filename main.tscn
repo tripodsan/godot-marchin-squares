@@ -1,8 +1,10 @@
-[gd_scene load_steps=5 format=3 uid="uid://ddypaku1dxkiq"]
+[gd_scene load_steps=9 format=3 uid="uid://ddypaku1dxkiq"]
 
+[ext_resource type="Script" path="res://BlobControl.gd" id="1_hssqv"]
 [ext_resource type="Script" path="res://blob.gd" id="1_j6j8t"]
 [ext_resource type="Script" path="res://blob_point.gd" id="2_wn51m"]
 [ext_resource type="Script" path="res://AutoSplitContainer.gd" id="3_cmt56"]
+[ext_resource type="Texture2D" uid="uid://cfbuiae3tt6pn" path="res://eyes.png" id="4_uix8j"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_cxf5i"]
 content_margin_left = 4.0
@@ -10,6 +12,12 @@ content_margin_top = 8.0
 content_margin_right = 4.0
 content_margin_bottom = 8.0
 bg_color = Color(0.141176, 0.141176, 0.141176, 0.470588)
+
+[sub_resource type="PhysicsMaterial" id="PhysicsMaterial_u7540"]
+rough = true
+bounce = 0.28
+
+[sub_resource type="WorldBoundaryShape2D" id="WorldBoundaryShape2D_7aoly"]
 
 [node name="Node2D" type="Node2D"]
 
@@ -25,6 +33,7 @@ grow_vertical = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 mouse_filter = 1
+script = ExtResource("1_hssqv")
 
 [node name="HSplitContainer" type="HSplitContainer" parent="Control"]
 layout_mode = 1
@@ -121,13 +130,22 @@ layout_mode = 2
 button_pressed = true
 flat = true
 
+[node name="Label9" type="Label" parent="Control/HSplitContainer/PanelContainer/VBoxContainer"]
+layout_mode = 2
+text = "Center of Mass"
+
+[node name="btn_calc_com" type="CheckButton" parent="Control/HSplitContainer/PanelContainer/VBoxContainer"]
+layout_mode = 2
+button_pressed = true
+flat = true
+
 [node name="Label4" type="Label" parent="Control/HSplitContainer/PanelContainer/VBoxContainer"]
 layout_mode = 2
 text = "Num Points:	"
 
 [node name="num_points" type="Label" parent="Control/HSplitContainer/PanelContainer/VBoxContainer"]
 layout_mode = 2
-text = "10"
+text = "108"
 horizontal_alignment = 2
 
 [node name="btn_add" type="Button" parent="Control/HSplitContainer/PanelContainer/VBoxContainer"]
@@ -138,8 +156,12 @@ text = "Add"
 layout_mode = 2
 text = "delete"
 
-[node name="blob" type="Node2D" parent="."]
-position = Vector2(313, 454)
+[node name="blob" type="RigidBody2D" parent="."]
+position = Vector2(231, 294)
+physics_material_override = SubResource("PhysicsMaterial_u7540")
+center_of_mass_mode = 1
+center_of_mass = Vector2(75, -55.511)
+angular_velocity = 0.0174533
 script = ExtResource("1_j6j8t")
 cell_size = 5.0
 show_grid = true
@@ -150,47 +172,54 @@ simplify_tolerance = 0.5
 
 [node name="polys" type="Node2D" parent="blob"]
 
-[node name="@Polygon2D@104851" type="Polygon2D" parent="blob/polys"]
-polygon = PackedVector2Array(290, -137.481, 300, -139.222, 310, -142.091, 320, -146.506, 330, -152.735, 340, -161.536, 347.03, -170, 353.032, -180, 357.117, -190, 359.529, -200, 360.576, -210, 359.565, -225, 357.204, -235, 353.2, -245, 347.369, -255, 340, -264.119, 330, -273.252, 315, -282.583, 305, -286.859, 290, -291.332, 260, -298.096, 250, -302.305, 245, -305.981, 240, -311.23, 220.108, -340, 206.694, -355, 200, -360.665, 190, -367.493, 175, -374.461, 165, -377.446, 150, -379.464, 135, -379.022, 125, -377.369, 110, -372.78, 100, -368.358, 65, -348.313, 60, -346.75, 55, -346.56, 50, -348.17, 45, -351.714, 16.1587, -385, 5.24254, -395, -5, -402.586, -15, -408.4, -30, -414.579, -40, -417.296, -55, -419.166, -70, -418.673, -80, -416.957, -95, -412.097, -105, -407.116, -115, -400.371, -125, -391.455, -130.676, -385, -137.699, -375, -142.949, -365, -148.253, -350, -150.96, -335, -151.485, -320, -150.639, -310, -147.872, -295, -143.335, -280, -132.658, -250, -132.103, -245, -133.081, -240, -137.003, -235, -165, -218.221, -180, -208.278, -193.798, -195, -200.895, -185, -205.836, -175, -209.002, -165, -210.703, -150, -209.891, -140, -207.647, -130, -203.433, -120, -195, -107.663, -185, -98.2504, -175, -91.9778, -165, -87.883, -155, -85.5872, -145, -84.7631, -135, -85.285, -125, -87.0955, -115, -90.4701, -105.461, -95, -97.1723, -100, -84.2966, -110, -70, -122.539, -65, -125.716, -60, -127.155, -55, -126.07, -50, -122.03, -45.2378, -115, -40, -103.369, -35, -87.1837, -30, -63.9546, -25.1573, -30, -23.2319, -10, -20, -6.42366, -15, -6.14388, 75, -5.18944, 80, -6.09275, 85, -36.2687, 90, -52.6147, 97.0796, -65, 105, -72.0254, 115, -76.3531, 140, -82.1312, 150, -85.1669, 160, -89.0553, 170, -94.3367, 185, -105.459, 194.598, -115, 210, -132.649, 215, -137.116, 220, -140.159, 225, -141.828, 235, -142.336, 270, -137.266, 290, -137.481)
+[node name="@Polygon2D@112157" type="Polygon2D" parent="blob/polys"]
+polygon = PackedVector2Array(0, 32.2543, 10, 32.2769, 25, 29.888, 35, 27.0452, 65, 15.4952, 75, 14.0789, 85, 15.4952, 115, 27.0452, 125, 29.888, 140, 32.2769, 150, 32.2543, 160, 30.8269, 170, 28.0397, 180, 23.4608, 190, 16.7404, 201.657, 5, 210.949, -10, 216.51, -25, 218.704, -35, 219.876, -45, 219.949, -65, 216.793, -85, 211.452, -100, 202.466, -115, 193.216, -125, 180, -134.433, 165, -140.608, 150, -143.27, 135, -142.836, 125, -140.965, 115, -138.068, 85, -126.53, 75, -125.092, 70, -125.466, 60, -128.119, 30, -139.6, 20, -142.064, 10, -143.292, -5, -142.771, -15, -140.608, -25, -137.01, -36.9753, -130, -45, -123.346, -52.4656, -115, -58.9304, -105, -65.257, -90, -68.8653, -75, -70.2344, -60, -69.8757, -45, -67.7583, -30, -63.181, -15, -58.3835, -5, -51.6569, 5, -45, 12.3314, -35, 20.3472, -25, 25.9454, -15, 29.5777, 0, 32.2543)
 
 [node name="points" type="Node2D" parent="blob"]
 
 [node name="point0" type="Marker2D" parent="blob/points"]
-position = Vector2(291, -212)
+position = Vector2(0, -80.511)
 script = ExtResource("2_wn51m")
-radius = 59.86
-
-[node name="point1" type="Marker2D" parent="blob/points"]
-position = Vector2(-62, -333)
-script = ExtResource("2_wn51m")
-radius = 75.099
 
 [node name="point2" type="Marker2D" parent="blob/points"]
-position = Vector2(-150, -148)
+position = Vector2(0, -30.511)
 script = ExtResource("2_wn51m")
-
-[node name="point3" type="Marker2D" parent="blob/points"]
-position = Vector2(137, -150)
-script = ExtResource("2_wn51m")
-radius = 42.828
-
-[node name="point4" type="Marker2D" parent="blob/points"]
-position = Vector2(28, -57)
-script = ExtResource("2_wn51m")
-radius = 56.274
-square = true
 
 [node name="point5" type="Marker2D" parent="blob/points"]
-position = Vector2(149, -304)
+position = Vector2(150, -80.511)
 script = ExtResource("2_wn51m")
-radius = 59.86
 
-[connection signal="value_changed" from="Control/HSplitContainer/PanelContainer/VBoxContainer/limit_spin" to="blob" method="_on_limit_spin_value_changed"]
-[connection signal="value_changed" from="Control/HSplitContainer/PanelContainer/VBoxContainer/range_spin" to="blob" method="_on_range_spin_value_changed"]
-[connection signal="toggled" from="Control/HSplitContainer/PanelContainer/VBoxContainer/btn_polygons" to="blob" method="_on_btn_polygons_toggled"]
-[connection signal="toggled" from="Control/HSplitContainer/PanelContainer/VBoxContainer/btn_simplify" to="blob" method="_on_btn_simplify_toggled"]
-[connection signal="value_changed" from="Control/HSplitContainer/PanelContainer/VBoxContainer/tolerance_spin" to="blob" method="_on_tolerance_spin_value_changed"]
-[connection signal="toggled" from="Control/HSplitContainer/PanelContainer/VBoxContainer/btn_grid" to="blob" method="_on_btn_grid_toggled"]
-[connection signal="toggled" from="Control/HSplitContainer/PanelContainer/VBoxContainer/btn_lines" to="blob" method="_on_btn_lines_toggled"]
-[connection signal="pressed" from="Control/HSplitContainer/PanelContainer/VBoxContainer/btn_add" to="blob" method="_on_btn_add_pressed"]
-[connection signal="pressed" from="Control/HSplitContainer/PanelContainer/VBoxContainer/btn_remove" to="blob" method="_on_btn_remove_pressed"]
+[node name="point6" type="Marker2D" parent="blob/points"]
+position = Vector2(150, -30.511)
+script = ExtResource("2_wn51m")
+
+[node name="visual" type="Node2D" parent="blob"]
+position = Vector2(75, -55.511)
+
+[node name="Eyes" type="Sprite2D" parent="blob/visual"]
+scale = Vector2(0.18, 0.18)
+texture = ExtResource("4_uix8j")
+
+[node name="@CollisionPolygon2D@112158" type="CollisionPolygon2D" parent="blob"]
+polygon = PackedVector2Array(0, 32.2543, 10, 32.2769, 25, 29.888, 35, 27.0452, 65, 15.4952, 75, 14.0789, 85, 15.4952, 115, 27.0452, 125, 29.888, 140, 32.2769, 150, 32.2543, 160, 30.8269, 170, 28.0397, 180, 23.4608, 190, 16.7404, 201.657, 5, 210.949, -10, 216.51, -25, 218.704, -35, 219.876, -45, 219.949, -65, 216.793, -85, 211.452, -100, 202.466, -115, 193.216, -125, 180, -134.433, 165, -140.608, 150, -143.27, 135, -142.836, 125, -140.965, 115, -138.068, 85, -126.53, 75, -125.092, 70, -125.466, 60, -128.119, 30, -139.6, 20, -142.064, 10, -143.292, -5, -142.771, -15, -140.608, -25, -137.01, -36.9753, -130, -45, -123.346, -52.4656, -115, -58.9304, -105, -65.257, -90, -68.8653, -75, -70.2344, -60, -69.8757, -45, -67.7583, -30, -63.181, -15, -58.3835, -5, -51.6569, 5, -45, 12.3314, -35, 20.3472, -25, 25.9454, -15, 29.5777, 0, 32.2543)
+
+[node name="floor" type="StaticBody2D" parent="."]
+position = Vector2(-17, 522)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="floor"]
+position = Vector2(469.5, 0)
+shape = SubResource("WorldBoundaryShape2D_7aoly")
+
+[node name="Polygon2D" type="Polygon2D" parent="floor"]
+polygon = PackedVector2Array(2.08165e-12, 2.08165e-12, 1000, 2.08165e-12, 1000, 20, 2.08165e-12, 20)
+
+[connection signal="value_changed" from="Control/HSplitContainer/PanelContainer/VBoxContainer/limit_spin" to="Control" method="_on_limit_spin_value_changed"]
+[connection signal="value_changed" from="Control/HSplitContainer/PanelContainer/VBoxContainer/range_spin" to="Control" method="_on_range_spin_value_changed"]
+[connection signal="toggled" from="Control/HSplitContainer/PanelContainer/VBoxContainer/btn_polygons" to="Control" method="_on_btn_polygons_toggled"]
+[connection signal="toggled" from="Control/HSplitContainer/PanelContainer/VBoxContainer/btn_simplify" to="Control" method="_on_btn_simplify_toggled"]
+[connection signal="value_changed" from="Control/HSplitContainer/PanelContainer/VBoxContainer/tolerance_spin" to="Control" method="_on_tolerance_spin_value_changed"]
+[connection signal="toggled" from="Control/HSplitContainer/PanelContainer/VBoxContainer/btn_grid" to="Control" method="_on_btn_grid_toggled"]
+[connection signal="toggled" from="Control/HSplitContainer/PanelContainer/VBoxContainer/btn_lines" to="Control" method="_on_btn_lines_toggled"]
+[connection signal="toggled" from="Control/HSplitContainer/PanelContainer/VBoxContainer/btn_calc_com" to="Control" method="_on_btn_calc_com_toggled"]
+[connection signal="pressed" from="Control/HSplitContainer/PanelContainer/VBoxContainer/btn_add" to="Control" method="_on_btn_add_pressed"]
+[connection signal="pressed" from="Control/HSplitContainer/PanelContainer/VBoxContainer/btn_remove" to="Control" method="_on_btn_remove_pressed"]

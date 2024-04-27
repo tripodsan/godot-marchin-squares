@@ -6,6 +6,8 @@ signal local_transform_changed()
 
 signal clicked(event:InputEventMouseButton)
 
+var show_lines:bool = true
+
 @export_range(1.0, 200.0) var radius:float = 50.0:
   set(value):
     radius = value
@@ -34,17 +36,23 @@ func _ready() -> void:
 func _enter_tree() -> void:
   set_notify_local_transform(true)
 
+func translate_silent(d:Vector2)->void:
+  set_notify_local_transform(false)
+  translate(d)
+  set_notify_local_transform(true)
+
 func _notification(what: int) -> void:
   if what == NOTIFICATION_LOCAL_TRANSFORM_CHANGED:
     local_transform_changed.emit()
     queue_redraw()
 
 func _draw()->void:
-  var color = Color.PLUM if selected else Color.BLUE_VIOLET
-  if square:
-    draw_rect(rect, color, false, 1.0)
-  else:
-    draw_arc(Vector2.ZERO, radius, 0, TAU, 64, color, 0.5, true)
+  if show_lines:
+    var color = Color.PLUM if selected else Color.BLUE_VIOLET
+    if square:
+      draw_rect(rect, color, false, 1.0)
+    else:
+      draw_arc(Vector2.ZERO, radius, 0, TAU, 64, color, 0.5, true)
 
 func sdf(x:float, y:float)->float:
   var dx = position.x - x
